@@ -22,7 +22,15 @@ namespace DomiPizza.Controllers
         // GET: OrderDetails
         public async Task<IActionResult> Index()
         {
-            var domiPizzaContext = _context.OrderDetails.Include(o => o.Order).Include(o => o.Pizza);
+            /*var domiPizzaContext = _context.OrderDetails.Include(o => o.Order).Include(o => o.Pizza);
+            return View(await domiPizzaContext.ToListAsync());*/
+
+            // Incluimos la Orden y LUEGO el Cliente de esa Orden. También incluimos la Pizza.
+            var domiPizzaContext = _context.OrderDetails
+                .Include(o => o.Order)
+                    .ThenInclude(or => or.Customer) // .ThenInclude se usa para incluir una relación de otra relación
+                .Include(o => o.Pizza);
+
             return View(await domiPizzaContext.ToListAsync());
         }
 
@@ -49,8 +57,24 @@ namespace DomiPizza.Controllers
         // GET: OrderDetails/Create
         public IActionResult Create()
         {
-            ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "Status");
+            /*ViewData["OrderId"] = new SelectList(_context.Orders, "OrderId", "Status");
             ViewData["PizzaId"] = new SelectList(_context.Pizzas, "PizzaId", "Name");
+            return View();*/
+
+            var ordersQuery = _context.Orders
+                .Include(o => o.Customer) 
+                .Select(o => new {
+                    o.OrderId,
+                    DisplayText = $"{o.Customer.FirstName} {o.Customer.LastName} ({o.OrderDate.ToShortDateString()})"
+                })
+                .ToList();
+
+            
+            ViewBag.OrderId = new SelectList(ordersQuery, "OrderId", "DisplayText");
+
+            
+            ViewBag.PizzaId = new SelectList(_context.Pizzas, "PizzaId", "Name");
+
             return View();
         }
 

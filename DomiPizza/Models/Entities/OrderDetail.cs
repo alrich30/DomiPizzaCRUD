@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace DomiPizza.Models.Entities
 {
@@ -27,10 +28,12 @@ namespace DomiPizza.Models.Entities
         [Required]
         public int PizzaId { get; set; }
 
+
         // --- Navigation Properties ---
         [ValidateNever]
         public Order Order { get; set; }
         [ValidateNever]
         public Pizza Pizza { get; set; }
+
     }
 }
